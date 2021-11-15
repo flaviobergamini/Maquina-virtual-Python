@@ -1,5 +1,5 @@
 '''
- ----------------------------23 BITS--------------------------------
+ ----------------------------18 BITS--------------------------------
   Codigo de maquina:
         OpCode               [0  -  3]  -> 3 BITS
         Registro de destino  [4  -  9]  -> 5 BITS
@@ -43,8 +43,6 @@
  -------------------------------------------------------------------
 '''
 
-import sys
-
 LENGTH_REGISTERS = 10
 ERROR_OP = 0
 ERROR_REGISTERS = 1
@@ -74,14 +72,14 @@ def fetch(instructions, pc):
     return (instructions + pc)
 
 def decode(instruction):
-    instruction_execute.op = (instruction & 0xf000) >> 12
-    instruction_execute.rd = (instruction & 0x0f00) >> 8
-    instruction_execute.rs1 = (instruction & 0x00f0) >> 4
+    instruction_execute.op = (instruction & 0x38000) >> 15
+    instruction_execute.rd = (instruction & 0x7C00) >> 10
+    instruction_execute.rs1 = (instruction & 0x03E0) >> 5
 
     if instruction_execute.op % 2 != 0:
-        instruction_execute.imediate = (instruction & 0x000f)
+        instruction_execute.imediate = (instruction & 0x001F)
     else:
-        instruction_execute.rs2 = (instruction & 0x000f)
+        instruction_execute.rs2 = (instruction & 0x001F)
 
     if instruction_execute.op > 6:  # Se o opcode ultrapassar o limite de instruções
         print('Erro de OPCODE')
@@ -231,37 +229,28 @@ def initRegisters():
     for i in range(LENGTH_REGISTERS):
         registers.append(i)
 
+'''
+-------------------------------------------------------------------
+MÁSCARA OP   MÁSCARA RD    MÁSCARA RS1    MÁSCARA RS2
+  0x38000      0x7C00       0x03E0          0x001F
+  
+             OP   RD   RS1  RS2        Instrucao:          
+  65 	 -> 000 00000 00010 00001       ADD                    
+  39076  -> 001 00110 00101 00100       SUB
 
-#-------------------------------------------------------------------
-#           OP   RD   RS1  RS2        Instrucao:
-#  33 	 -> 0000 0000 0010 0001       ADD
-#  9812  -> 0010 0110 0101 0100       SUB
-#
-#           OP   RD   RS1  IMEDIATO
-#  4144  -> 0001 0000 0011 0000       ADDi
-#  13361 -> 0011 0100 0011 0001       SUBi
-#
-#           OP   RD   RS1  RS2        Instrucao:
-#  16432 -> 0100 0000 0011 0000      AND
-#  21553 -> 0101 0100 0011 0001       OR
+             OP   RD   RS1  IMEDIATO
+  69729  -> 010 00100 00011 00001       SUBi
+  98400  -> 011 00000 00011 00000       ADDi
 
-
-#             OP   RD   RS1  RS2        Instrucao:
-#  65 	  -> 000 00000 00010 00001       ADD
-#  71844  -> 010 00110 00101 00100       SUB
-#
-#             OP   RD   RS1  IMEDIATO
-#  32864  -> 001 00000 00011 00000       ADDi
-#  102497 -> 011 00100 00011 00001       SUBi
-#
-#             OP   RD   RS1  RS2
-#  131168 -> 100 00000 00011 00000      AND
-#  168033 -> 101 00100 00011 00001       OR
-#-------------------------------------------------------------------
+             OP   RD   RS1  RS2
+  131168 -> 100 00000 00011 00000      AND
+  168033 -> 101 00100 00011 00001       OR
+-------------------------------------------------------------------
+'''
 
 if __name__ == "__main__":
     print('#'*30, 'Arquitetura AFGL', '#'*30)
-    instructions = [33, 4144, 9812, 13361, 16432, 21553]
+    instructions = [65, 39076, 69729, 98400, 131168, 168033]
     IR = []
     pc = 0
 
@@ -283,12 +272,12 @@ if __name__ == "__main__":
         pc += 1
 
     print('#'*15, 'Registradores', '#'*15)
-    print(f'+{"-"*14}+{"-"*7}+')
-    print(f'| Resgistrador | Valor |')
-    print(f'+{"-" * 14}+{"-" * 7}+')
+    print(f'{"-"*14}+{"-"*7}')
+    print(f' Resgistrador | Valor ')
+    print(f'{"-" * 14}+{"-" * 7}')
     for i in range(LENGTH_REGISTERS):
-        print(f"|    f{i}        | {registers[i]}     |")
-    print(f'+{"-" * 14}+{"-" * 7}+')
+        print(f"     f{i}       | {registers[i]}     ")
+    print(f'{"-" * 14}+{"-" * 7}')
 
 
 
