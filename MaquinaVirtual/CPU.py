@@ -2,7 +2,6 @@
 class boby_instruction(object):  # instruction_execute
     def __init__(self):
         self.op = None
-        self.op = None
         self.rd = None
         self.rs1 = None
         self.rs2 = None
@@ -31,7 +30,7 @@ class AFGL(object):
         self.instruction_execute.rd = (instruction & 0x7C00) >> 10
         self.instruction_execute.rs1 = (instruction & 0x03E0) >> 5
 
-        if self.instruction_execute.op % 2 != 0:
+        if self.instruction_execute.op == 0b010 or self.instruction_execute.op == 0b011:
             self.instruction_execute.imediate = (instruction & 0x001F)
         else:
             self.instruction_execute.rs2 = (instruction & 0x001F)
@@ -40,7 +39,7 @@ class AFGL(object):
             print('Erro de OPCODE')
             return self.ERROR_OP                                  # Retorna 0 para a mensagem de erro de opcode
 
-        if self.instruction_execute.rd > 6 or self.instruction_execute.rs1 > 6 or self.instruction_execute.rs2 > 6:
+        if self.instruction_execute.rd > 10 or self.instruction_execute.rs1 > 10 or self.instruction_execute.rs2 > 10:
             print(self.instruction_execute.rd, self.instruction_execute.rs1, self.instruction_execute.rs2)
             print('Erro de registrador')
             return self.ERROR_REGISTERS                           # Retorna 1 para a mensagem de erro de registro
