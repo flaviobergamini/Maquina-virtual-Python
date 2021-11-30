@@ -205,13 +205,10 @@ class AFGL(object):
                 self.mc.tag = -1
                 self.mc.data.append(0)
                 self.cache.insert(i, self.mc)
-            #print(self.cache[i])
 
     def fetch_cache(self, instructions, pc):
-        c = pc & 0x0001
         l = (pc & 0x0002) >> 1
         tag = (pc & 0xFFFC) >> 2
-        #print(pc, '-----', c, '-----', l, '-----', tag)
 
         if not(self.cache[l].valid) and self.cache[l].tag != tag:
             print("Cache Miss")
@@ -220,14 +217,12 @@ class AFGL(object):
                 self.cache[i].valid = True
                 self.cache[i].tag = tag
                 for j in range(self.WORDS):
-                    #print(self.cache[i].data)
-                    if pos < 6:
-                        self.cache[i].data[j] = instructions[pc +pos]
+                    if pos < self.WORDS:
+                        self.cache[i].data[j] = instructions[pc + pos]
                         pos += 1
 
         else:
             print("Cache Hit")
-            #print(self.cache[l].data[c])
-        return self.cache[l].data[c]
+        return self.cache[0].data[pc]
 
 
