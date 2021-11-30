@@ -7,14 +7,27 @@ class boby_instruction(object):  # instruction_execute
         self.rs2 = None
         self.imediate = None
 
+
+class MemoriaCache(object):
+    def __init__(self):
+        self.valid = None
+        self.tag = None
+        self.data = []
+
+
+
 class AFGL(object):
     def __init__(self):
         self.instruction_execute = boby_instruction()
+        self.mc = MemoriaCache()
         self.LENGTH_REGISTERS = 10
         self.ERROR_OP = 0
         self.ERROR_REGISTERS = 1
         self.SUCCESS = 2
         self.registers = []  # lista com no máximo 10 registradores de $f0 à $f9
+        self.cache = [] 
+
+        self.WORDS = 6 # quantidade colunas cache
 
         self.MNEMONICS = ["ADD", "SUB", "SUBi", "ADDi", "AND", "OR"]
 
@@ -184,3 +197,37 @@ class AFGL(object):
     def initRegisters(self):
         for i in range(self.LENGTH_REGISTERS):
             self.registers.append(i)
+
+    def initCache(self):
+        for i in range(2):
+            for j in range(3):
+                self.mc.valid = False
+                self.mc.tag = -1
+                self.mc.data.append(0)
+                self.cache.insert(i, self.mc)
+            #print(self.cache[i])
+
+    def fetch_cache(self, instructions, pc):
+        c = pc & 0x0001
+        l = (pc & 0x0002) >> 1
+        tag = (pc & 0xFFFC) >> 2
+        #print(pc, '-----', c, '-----', l, '-----', tag)
+
+        if not(self.cache[l].valid) and self.cache[l].tag != tag:
+            print("Cache Miss")
+            pos = 0
+            for i in range(2):
+                self.cache[i].valid = True
+                self.cache[i].tag = tag
+                for j in range(self.WORDS):
+                    #print(self.cache[i].data)
+                    if pos < 6:
+                        self.cache[i].data[j] = instructions[pc +pos]
+                        pos += 1
+
+        else:
+            print("Cache Hit")
+            #print(self.cache[l].data[c])
+        return self.cache[l].data[c]
+
+

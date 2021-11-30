@@ -71,10 +71,11 @@ if __name__ == "__main__":
     pc = 0
 
     afgl.initRegisters()
+    afgl.initCache()
     afgl.clearInstruction(instruction_execute)
 
     while pc < len(instructions):
-        IR.append(afgl.fetch(instructions[pc], pc))
+        IR.append(afgl.fetch_cache(instructions, pc))
         res = afgl.decode(IR[pc])
 
         if res == afgl.ERROR_OP:
